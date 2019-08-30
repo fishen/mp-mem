@@ -92,26 +92,9 @@
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var cacheStore = new WeakMap();
-var defaultKey = Symbol();
 var innerCacheStores = new Set();
 var map_age_cleaner_1 = __webpack_require__(1);
 var utils_1 = __webpack_require__(2);
-var defaultCacheKey = function () {
-    var args = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-        args[_i] = arguments[_i];
-    }
-    if (args.length === 0) {
-        return defaultKey;
-    }
-    if (args.length === 1) {
-        var first = args[0];
-        if (utils_1.isPrimitive(args)) {
-            return first;
-        }
-    }
-    return JSON.stringify(args);
-};
 /**
  * Clear all cached data of a memoized function.
  * @param fn the memoized function.
@@ -154,7 +137,7 @@ exports.clearAll = clearAll;
  * memoized();
  */
 function mem(fn, options) {
-    options = Object.assign({ maxAge: Infinity, cache: new Map(), cacheKey: defaultCacheKey }, options);
+    options = Object.assign({ maxAge: Infinity, cache: new Map(), cacheKey: utils_1.defaultCacheKey }, options);
     var maxAge = options.maxAge, cacheKey = options.cacheKey, cache = options.cache, cachePromiseRejection = options.cachePromiseRejection;
     if (typeof maxAge === "number" && maxAge !== Infinity) {
         map_age_cleaner_1.default(cache);
@@ -218,7 +201,7 @@ function memoize(options) {
         memoized = mem(original, options);
         descriptor.value = memoized;
     };
-    decorator.clear = function () { return memoized && clear(memoized); };
+    decorator.clear = function () { return utils_1.isFn(memoized) && clear(memoized); };
     return decorator;
 }
 exports.memoize = memoize;
@@ -262,6 +245,19 @@ function isPromise(p) {
     return isFn(p.then) && isFn(p.catch);
 }
 exports.isPromise = isPromise;
+var defaultKey = Symbol();
+function defaultCacheKey() {
+    var args = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        args[_i] = arguments[_i];
+    }
+    if (args.length === 0) {
+        return defaultKey;
+    }
+    var first = args[0];
+    return args.length === 1 && isPrimitive(first) ? first : JSON.stringify(args);
+}
+exports.defaultCacheKey = defaultCacheKey;
 
 
 /***/ })

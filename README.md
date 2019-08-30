@@ -67,8 +67,7 @@ console.log(memoized(), memoized());//0.1748406286127786 0.1748406286127786
 ```
 ## memoize( options?: object )
 Memoize a method.
-* **options**: memoize options, consistent with the options parameter of the **mem** function
-remote.
+* **options**: memoize options, consistent with the options parameter of the **mem** function.
 ```
 import { memoize } from 'mp-mem';
 

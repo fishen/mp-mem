@@ -3,6 +3,7 @@ declare module "mp-mem/src/utils" {
     export function isObj(obj: any): boolean;
     export function isPrimitive(obj: any): boolean;
     export function isPromise(p: any): boolean;
+    export function defaultCacheKey(...args: any[]): any;
 }
 declare module "mp-mem" {
     export interface ICacheStore<TKey = any, TValue = any> {

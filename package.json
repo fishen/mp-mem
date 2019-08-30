@@ -1,10 +1,10 @@
 {
   "name": "mp-mem",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A lightweight memoize library that can be used on both normal functions and class methods.",
   "main": "index.js",
   "scripts": {
-    "test": "ts-node test/index.ts",
+    "test": "ts-node test/index.ts && ts-node test/utils.ts",
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
     "fix": "tslint -c tslint.json 'src/**/*.ts' --fix",
     "dts": "gulp dts",

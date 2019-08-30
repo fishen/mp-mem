@@ -16,3 +16,13 @@ export function isPromise(p: any) {
     if (!isObj(p) && !isFn(p)) { return false; }
     return isFn(p.then) && isFn(p.catch);
 }
+
+const defaultKey = Symbol();
+
+export function defaultCacheKey(...args: any[]) {
+    if (args.length === 0) {
+        return defaultKey;
+    }
+    const [first] = args;
+    return args.length === 1 && isPrimitive(first) ? first : JSON.stringify(args);
+}

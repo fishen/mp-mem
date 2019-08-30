@@ -1,21 +1,7 @@
 let cacheStore = new WeakMap();
-const defaultKey = Symbol();
 const innerCacheStores: Set<ICacheStore> = new Set();
 import clean from "map-age-cleaner";
-import { isPrimitive, isPromise } from "./utils";
-
-const defaultCacheKey = (...args: any[]) => {
-    if (args.length === 0) {
-        return defaultKey;
-    }
-    if (args.length === 1) {
-        const [first] = args;
-        if (isPrimitive(args)) {
-            return first;
-        }
-    }
-    return JSON.stringify(args);
-};
+import { defaultCacheKey, isFn, isPromise } from "./utils";
 
 export interface ICacheStore<TKey = any, TValue = any> {
     has(key: TKey): boolean;
@@ -151,6 +137,6 @@ export function memoize(options?: IMemOptions): {
         memoized = mem(original, options!);
         descriptor.value = memoized;
     };
-    decorator.clear = () => memoized && clear(memoized);
+    decorator.clear = () => isFn(memoized) && clear(memoized);
     return decorator;
 }
