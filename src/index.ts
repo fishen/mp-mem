@@ -19,7 +19,7 @@ export interface IMemOptions<TKey = any, TValue = any> {
     cacheKey?: (...args: any[]) => TKey;
     /**
      * Use a different cache storage.
-     * default is new Map().
+     * @default new Map()
      */
     cache?: ICacheStore<TKey, TValue>;
     /**
@@ -28,7 +28,7 @@ export interface IMemOptions<TKey = any, TValue = any> {
     cachePromiseRejection?: boolean;
     /**
      * Milliseconds until the cache expires.
-     * default is Infinity.
+     * @default Infinity
      */
     maxAge?: number;
 }
@@ -67,7 +67,7 @@ export function clearAll() {
  * @param fn function to be memoized.
  * @param options memoize options.
  * @example
- *
+ * 
  * import { mem } from 'mp-mem';
  *
  * function test() {return Math.random();}
@@ -80,7 +80,7 @@ export function mem(fn: (...args: any[]) => any, options?: IMemOptions) {
     if (typeof maxAge === "number" && maxAge !== Infinity) {
         clean(cache as any);
     }
-    const memoized = function(...args: any[]) {
+    const memoized = function (...args: any[]) {
         const key = cacheKey!(...args);
         if (cache!.has(key)) {
             const { data, maxAge: expiredTime } = cache!.get(key);
@@ -124,12 +124,9 @@ export function mem(fn: (...args: any[]) => any, options?: IMemOptions) {
  *
  * cleanableMem.clear();
  */
-export function memoize(options?: IMemOptions): {
-    (target: any, name: string, descriptor: PropertyDescriptor): void;
-    clear(): void;
-} {
+export function memoize(options?: IMemOptions): MethodDecorator & { clear(): void; } {
     let memoized: any;
-    const decorator = function(target: any, name: string, descriptor: PropertyDescriptor) {
+    const decorator = function (target: any, name: string, descriptor: PropertyDescriptor) {
         const original = descriptor.value;
         if (typeof original !== "function") {
             throw new Error("The decorator memoize can only be used on functions.");
