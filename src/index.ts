@@ -1,6 +1,5 @@
 let cacheStore = new WeakMap();
 const innerCacheStores: Set<ICacheStore> = new Set();
-import clean from "map-age-cleaner";
 import { defaultCacheKey, isFn, isPromise } from "./utils";
 
 export interface ICacheStore<TKey = any, TValue = any> {
@@ -67,7 +66,7 @@ export function clearAll() {
  * @param fn function to be memoized.
  * @param options memoize options.
  * @example
- * 
+ *
  * import { mem } from 'mp-mem';
  *
  * function test() {return Math.random();}
@@ -77,13 +76,10 @@ export function clearAll() {
 export function mem(fn: (...args: any[]) => any, options?: IMemOptions) {
     options = Object.assign({ maxAge: Infinity, cache: new Map(), cacheKey: defaultCacheKey }, options);
     const { maxAge, cacheKey, cache, cachePromiseRejection } = options;
-    if (typeof maxAge === "number" && maxAge !== Infinity) {
-        clean(cache as any);
-    }
     const memoized = function (...args: any[]) {
         const key = cacheKey!(...args);
         if (cache!.has(key)) {
-            const { data, maxAge: expiredTime } = cache!.get(key);
+            const { data, expiredTime } = cache!.get(key);
             if (typeof maxAge === "number" && Date.now() < expiredTime) {
                 return data;
             } else {
@@ -93,7 +89,7 @@ export function mem(fn: (...args: any[]) => any, options?: IMemOptions) {
         const cacheItem = fn.apply(this, args);
         cache!.set(key, {
             data: cacheItem,
-            maxAge: maxAge ? Date.now() + maxAge : Infinity,
+            expiredTime: maxAge ? Date.now() + maxAge : Infinity,
         });
         if (isPromise(cacheItem) && !cachePromiseRejection) {
             cacheItem.catch(() => cache!.delete(key));

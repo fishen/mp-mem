@@ -91,10 +91,10 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.memoize = exports.mem = exports.clearAll = exports.clear = void 0;
 var cacheStore = new WeakMap();
 var innerCacheStores = new Set();
-var map_age_cleaner_1 = __webpack_require__(1);
-var utils_1 = __webpack_require__(2);
+var utils_1 = __webpack_require__(1);
 /**
  * Clear all cached data of a memoized function.
  * @param fn the memoized function.
@@ -139,9 +139,6 @@ exports.clearAll = clearAll;
 function mem(fn, options) {
     options = Object.assign({ maxAge: Infinity, cache: new Map(), cacheKey: utils_1.defaultCacheKey }, options);
     var maxAge = options.maxAge, cacheKey = options.cacheKey, cache = options.cache, cachePromiseRejection = options.cachePromiseRejection;
-    if (typeof maxAge === "number" && maxAge !== Infinity) {
-        map_age_cleaner_1.default(cache);
-    }
     var memoized = function () {
         var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
@@ -149,7 +146,7 @@ function mem(fn, options) {
         }
         var key = cacheKey.apply(void 0, args);
         if (cache.has(key)) {
-            var _a = cache.get(key), data = _a.data, expiredTime = _a.maxAge;
+            var _a = cache.get(key), data = _a.data, expiredTime = _a.expiredTime;
             if (typeof maxAge === "number" && Date.now() < expiredTime) {
                 return data;
             }
@@ -160,7 +157,7 @@ function mem(fn, options) {
         var cacheItem = fn.apply(this, args);
         cache.set(key, {
             data: cacheItem,
-            maxAge: maxAge ? Date.now() + maxAge : Infinity,
+            expiredTime: maxAge ? Date.now() + maxAge : Infinity,
         });
         if (utils_1.isPromise(cacheItem) && !cachePromiseRejection) {
             cacheItem.catch(function () { return cache.delete(key); });
@@ -209,17 +206,12 @@ exports.memoize = memoize;
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports) {
-
-module.exports = require("map-age-cleaner");
-
-/***/ }),
-/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.defaultCacheKey = exports.isPromise = exports.isPrimitive = exports.isObj = exports.isFn = void 0;
 function isFn(fn) {
     return typeof fn === "function";
 }
